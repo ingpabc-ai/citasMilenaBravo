@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
+from twilio.twiml.messaging_response import MessagingResponse
 
 app = Flask(__name__)
 
@@ -6,12 +7,21 @@ app = Flask(__name__)
 def home():
     return "Chatbot Milena Bravo está en línea 🚀"
 
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    data = request.json
-    # Aquí procesas los mensajes que lleguen de WhatsApp / API
-    print("Mensaje recibido:", data)
-    return jsonify({"status": "ok"}), 200
+@app.route('/whatsapp', methods=['POST'])
+def whatsapp_reply():
+    # Captura el mensaje entrante
+    incoming_msg = request.values.get('Body', '').lower()
+    
+    # Crea la respuesta
+    resp = MessagingResponse()
+    
+    if 'hola' in incoming_msg:
+        resp.message("¡Hola! Gracias por escribir a Milena Bravo. 😊")
+    else:
+        resp.message("Gracias por tu mensaje. Te responderemos pronto.")
+    
+    return str(resp)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
